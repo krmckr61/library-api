@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(nanoid(21)) @db.VarChar(21)
+
+  name     String @db.VarChar(255)
+  email    String @unique @db.VarChar(255)
+  password String @db.VarChar(255)
+
+  @@map("user")
+}
+
+model Author {
+  id String @id @default(nanoid(21)) @db.VarChar(21)
+
+  name String @db.VarChar(255)
+
+  books Book[]
+
+  @@map("author")
+}
+
+model BookType {
+  id String @id @default(nanoid(21)) @db.VarChar(21)
+
+  name  String @db.VarChar(255)
+  books Book[]
+
+  @@map("book_type")
+}
+
+model Book {
+  id String @id @default(nanoid(21)) @db.VarChar(21)
+
+  name        String @db.VarChar(255)
+  publishYear Int    @map("publish_year") @db.SmallInt()
+
+  author   Author @relation(fields: [authorId], references: [id])
+  authorId String @map("author_id") @db.VarChar(21)
+
+  type   BookType @relation(fields: [typeId], references: [id])
+  typeId String   @map("type_id") @db.VarChar(21)
+
+  averageScore Float? @map("average_score")
+  scoreCount   Int?   @map("score_count") @db.SmallInt()
+
+  @@map("book")
+}
